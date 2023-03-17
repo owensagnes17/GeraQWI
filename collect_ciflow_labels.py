@@ -8,7 +8,6 @@ GITHUB_DIR = Path(__file__).parent.parent
 
 def get_workflows_push_tags() -> Set[str]:
     "Extract all known push tags from workflows"
-    rc: Set[str] = set()
     for fname in (GITHUB_DIR / "workflows").glob("*.yml"):
         with fname.open("r") as f:
             wf_yml = yaml.safe_load(f)
@@ -16,7 +15,6 @@ def get_workflows_push_tags() -> Set[str]:
         on_tag = wf_yml.get(True, None)
         push_tag = on_tag.get("push", None) if isinstance(on_tag, dict) else None
         tags_tag = push_tag.get("tags", None) if isinstance(push_tag, dict) else None
-        if isinstance(tags_tag, list):
             rc.update(tags_tag)
     return rc
 
@@ -35,7 +33,6 @@ def update_probot_config(labels: Set[str]) -> None:
     orig = read_probot_config()
     orig["ciflow_push_tags"] = filter_ciflow_tags(labels)
     with (GITHUB_DIR / "pytorch-probot.yml").open("w") as f:
-        yaml.dump(orig, f, indent=4, sort_keys=False)
 
 
 if __name__ == "__main__":
